@@ -149,26 +149,30 @@ function getShellRcPath(): string {
 function getAutoStartSnippet(): string {
   const mainScript = join(__dirname, 'main.js')
   // This snippet:
-  // 1. Only runs in interactive shells
-  // 2. Checks if already inside tmux
-  // 3. If in tmux: checks if buddy pane exists, spawns one if not
-  // 4. If not in tmux: starts a detached buddy tmux session in background
+  // 1. Only runs in interactive shells with node + tmux available
+  // 2. If not in tmux: auto-enter tmux (new or existing session), then the
+  //    tmux branch spawns the buddy pane. `exec` replaces the shell so
+  //    closing tmux closes the terminal naturally.
+  // 3. If in tmux: spawn buddy pane if not already running
   return `${SHELL_MARKER_BEGIN}
 # Auto-start claude-buddy companion
 if [[ $- == *i* ]] && command -v node >/dev/null 2>&1 && command -v tmux >/dev/null 2>&1; then
   _claude_buddy_main="${mainScript}"
   _claude_buddy_sock="${getConfigDir()}/buddy.sock"
-  if [[ -n "$TMUX" ]]; then
-    # Inside tmux: spawn buddy pane if not already running
-    if [[ ! -S "$_claude_buddy_sock" ]]; then
-      tmux split-window -h -l 36 -d "node --enable-source-maps $_claude_buddy_main" 2>/dev/null
-      tmux select-pane -t '{last}' -T claude-buddy 2>/dev/null
+  if [[ -z "$TMUX" ]]; then
+    # Not in tmux: auto-enter tmux session
+    if tmux has-session -t main 2>/dev/null; then
+      exec tmux attach -t main
+    else
+      exec tmux new-session -s main
     fi
-  else
-    # Outside tmux: start buddy in a detached session (attach with: tmux attach -t buddy-session)
-    if ! tmux has-session -t buddy-session 2>/dev/null; then
-      tmux new-session -d -s buddy-session -x 40 -y 24 "node --enable-source-maps $_claude_buddy_main" 2>/dev/null
-    fi
+    # exec replaces this shell — lines below only run inside tmux
+  fi
+  # Inside tmux: spawn buddy pane if not already running
+  if [[ ! -S "$_claude_buddy_sock" ]]; then
+    tmux split-window -h -l 36 -d "node --enable-source-maps $_claude_buddy_main" 2>/dev/null
+    tmux select-pane -t '{last}' -T claude-buddy 2>/dev/null
+    tmux select-pane -t '{previous}' 2>/dev/null
   fi
   unset _claude_buddy_main _claude_buddy_sock
 fi
@@ -192,12 +196,11 @@ function installAutostart(): void {
   appendFileSync(rcPath, '\n' + snippet + '\n')
   console.log(`Installed auto-start in ~/${rcName}`)
   console.log('')
-  console.log('Behavior:')
-  console.log('  - In tmux: auto-spawns a buddy pane (right side, 36 cols)')
-  console.log('  - Outside tmux: starts buddy in a detached "buddy-session"')
-  console.log('    (attach with: tmux attach -t buddy-session)')
+  console.log('Every new terminal will now:')
+  console.log('  1. Auto-enter tmux (session "main")')
+  console.log('  2. Spawn a buddy pane on the right (36 cols)')
   console.log('')
-  console.log(`Restart your terminal or run: source ~/${rcName}`)
+  console.log(`Restart your terminal to see it. (or: source ~/${rcName})`)
 }
 
 function uninstallAutostart(): void {

@@ -118,7 +118,8 @@ export function App(): React.ReactNode {
       flexDirection="column"
       alignItems="center"
       justifyContent="flex-end"
-      height={rows}
+      minHeight={rows}
+      width="100%"
     >
       {showStats && (
         <StatsCard companion={companion} />

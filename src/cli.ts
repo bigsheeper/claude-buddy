@@ -154,35 +154,42 @@ function getAutoStartSnippet(): string {
   //    tmux branch spawns the buddy pane. `exec` replaces the shell so
   //    closing tmux closes the terminal naturally.
   // 3. If in tmux: spawn buddy pane if not already running
+  const lockFile = join(getConfigDir(), 'spawn.lock')
   return `${SHELL_MARKER_BEGIN}
 # Auto-start claude-buddy companion
 if [[ $- == *i* ]] && command -v node >/dev/null 2>&1 && command -v tmux >/dev/null 2>&1; then
   _claude_buddy_main="${mainScript}"
+  _claude_buddy_lock="${lockFile}"
   _cb_ensure_buddy() {
-    # Spawn buddy pane in session $1 if not already present
-    if ! tmux list-panes -t "$1" -F '#{pane_title}' 2>/dev/null | grep -q 'claude-buddy'; then
-      tmux split-window -t "$1" -h -l 36 "node --enable-source-maps $_claude_buddy_main" 2>/dev/null
-      sleep 0.5
-      tmux select-pane -t "$1:{last}" -T claude-buddy 2>/dev/null
-      tmux select-pane -t "$1:{previous}" 2>/dev/null
+    local sess="$1"
+    # Pane title check — skip if buddy already exists
+    if tmux list-panes -t "$sess" -F '#{pane_title}' 2>/dev/null | grep -q 'claude-buddy'; then
+      return
     fi
+    # Lock file prevents duplicate spawns from concurrent shells
+    if [[ -f "$_claude_buddy_lock" ]]; then
+      local age=$(( $(date +%s) - $(stat -f%m "$_claude_buddy_lock" 2>/dev/null || echo 0) ))
+      [[ $age -lt 5 ]] && return
+    fi
+    touch "$_claude_buddy_lock" 2>/dev/null
+    tmux split-window -t "$sess" -h -l 20 "node --enable-source-maps $_claude_buddy_main" 2>/dev/null
+    sleep 0.5
+    tmux select-pane -t "$sess:{last}" -T claude-buddy 2>/dev/null
+    tmux select-pane -t "$sess:{previous}" 2>/dev/null
+    rm -f "$_claude_buddy_lock" 2>/dev/null
   }
   if [[ -z "$TMUX" ]]; then
-    # Not in tmux: ensure buddy pane exists, then enter tmux
-    if tmux has-session -t main 2>/dev/null; then
-      _cb_ensure_buddy main
-      exec tmux attach -t main
-    else
-      # New session — create it, then spawn buddy inside
+    # Not in tmux: ensure session + buddy, then attach
+    if ! tmux has-session -t main 2>/dev/null; then
       tmux new-session -d -s main 2>/dev/null
-      _cb_ensure_buddy main
-      exec tmux attach -t main
     fi
+    _cb_ensure_buddy main
+    exec tmux attach -t main
   else
-    # Already in tmux: ensure buddy pane in current session
+    # Already in tmux: ensure buddy in current session
     _cb_ensure_buddy "$(tmux display-message -p '#S')"
   fi
-  unset _claude_buddy_main
+  unset _claude_buddy_main _claude_buddy_lock
   unset -f _cb_ensure_buddy
 fi
 ${SHELL_MARKER_END}`

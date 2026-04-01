@@ -93,11 +93,25 @@ Your buddy gains XP and levels up over time:
 
 Stats grow with level — all stats get +5/+10/+15/+20 at milestones, plus peak stat gets +2 per even level.
 
+### Visual Evolution
+
+Each form adds decorations to your buddy's sprite:
+
+| Form | Level | Visual Effect |
+|------|-------|---------------|
+| Baby | 1-4 | Base sprite |
+| Teen | 5-9 | Sparkle accent |
+| Adult | 10-14 | Side glow markers `>...<` |
+| Elite | 15-19 | Side decorations `»...«` + bottom accent |
+| Legend | 20 | Golden color + `✦` border |
+
 ### Animations
 
 - **Idle loop** — 15-frame sequence at 500ms ticks (~7.5s cycle): mostly resting, occasional fidgets, rare blinks
 - **Petting** — 5-frame floating hearts animation (2.5s burst)
 - **Speaking** — Speech bubble with word-wrap, 10s display, 3s fade-out
+- **Sleeping** (level 5+) — zzZ floating above sprite, closed eyes, triggers after 60s idle
+- **Dancing** (level 15+) — side-to-side bounce while being petted
 
 ### Speech Bubbles
 

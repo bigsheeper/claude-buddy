@@ -169,9 +169,11 @@ if [[ $- == *i* ]] && command -v node >/dev/null 2>&1 && command -v tmux >/dev/n
   # Inside tmux: spawn buddy pane if not already present
   # Use tmux pane title to detect (reliable even after crash/stale socket)
   if ! tmux list-panes -F '#{pane_title}' 2>/dev/null | grep -q 'claude-buddy'; then
-    tmux split-window -h -l 36 -d "node --enable-source-maps $_claude_buddy_main" 2>/dev/null
+    # No -d flag: new pane must be foreground briefly so Ink can set raw mode
+    tmux split-window -h -l 36 "node --enable-source-maps $_claude_buddy_main" 2>/dev/null
     tmux select-pane -t '{last}' -T claude-buddy 2>/dev/null
-    tmux select-pane -t '{previous}' 2>/dev/null
+    # Switch focus back to the original (left) pane
+    tmux select-pane -L 2>/dev/null
   fi
   unset _claude_buddy_main
 fi

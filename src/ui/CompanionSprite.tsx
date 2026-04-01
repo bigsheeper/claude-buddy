@@ -111,7 +111,7 @@ export function CompanionSprite({
   )
 
   // Apply evolution decorations
-  body = applyFormDecoration(body, form, tick)
+  body = applyFormDecoration(body, form, companion.eye, tick)
 
   // Apply special animations
   if (isSleeping) {

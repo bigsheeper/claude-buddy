@@ -180,12 +180,11 @@ if [[ $- == *i* ]] && command -v node >/dev/null 2>&1 && command -v tmux >/dev/n
     rm -f "$_claude_buddy_lock" 2>/dev/null
   }
   if [[ -z "$TMUX" ]]; then
-    # Not in tmux: ensure session + buddy, then attach
-    if ! tmux has-session -t main 2>/dev/null; then
-      tmux new-session -d -s main 2>/dev/null
-    fi
-    _cb_ensure_buddy main
-    exec tmux attach -t main
+    # Not in tmux: create a fresh session per terminal window
+    _cb_sess="cb-$$"
+    tmux new-session -d -s "$_cb_sess" 2>/dev/null
+    _cb_ensure_buddy "$_cb_sess"
+    exec tmux attach -t "$_cb_sess"
   else
     # Already in tmux: ensure buddy in current session
     _cb_ensure_buddy "$(tmux display-message -p '#S')"

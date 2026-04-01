@@ -125,8 +125,7 @@ node dist/cli.js install
 
 That's it. Open a new terminal and your buddy will be there.
 
-- **In tmux** — auto-spawns a buddy pane on the right (36 cols)
-- **Outside tmux** — starts buddy in a detached session (`tmux attach -t buddy-session` to see it)
+Every new terminal window automatically enters tmux with a buddy pane on the right (20 cols). Each terminal gets its own independent session — fresh every time, no leftover history.
 
 ## Usage
 

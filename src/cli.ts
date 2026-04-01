@@ -1,9 +1,9 @@
-import { execSync, spawn } from 'node:child_process'
+import { execSync } from 'node:child_process'
 import { existsSync, readFileSync, writeFileSync, appendFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { homedir } from 'node:os'
-import { sendCommand } from './ipc/client.js'
+import { sendCommand, type IpcCommand } from './ipc/client.js'
 import { getSocketPath, getConfigDir } from './state/config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -98,12 +98,13 @@ async function main(): Promise<void> {
   }
 
   // Direct IPC commands (no tmux needed)
-  if (['pet', 'stats', 'mute'].includes(command)) {
+  const ipcCommands: IpcCommand[] = ['pet', 'stats', 'mute']
+  if (ipcCommands.includes(command as IpcCommand)) {
     if (!isBuddyRunning()) {
       console.log('No buddy is running. Open a new terminal after install.')
       process.exit(1)
     }
-    const ok = await sendCommand(command)
+    const ok = await sendCommand(command as IpcCommand)
     if (ok) {
       console.log(command === 'pet' ? '♥ Petted!' : `Sent: ${command}`)
     } else {
@@ -189,7 +190,7 @@ if [[ $- == *i* ]] && command -v node >/dev/null 2>&1 && command -v tmux >/dev/n
     # Already in tmux: ensure buddy in current session
     _cb_ensure_buddy "$(tmux display-message -p '#S')"
   fi
-  unset _claude_buddy_main _claude_buddy_lock
+  unset _claude_buddy_main _claude_buddy_lock _cb_sess
   unset -f _cb_ensure_buddy
 fi
 ${SHELL_MARKER_END}`

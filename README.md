@@ -114,7 +114,7 @@ sudo apt install tmux  # Ubuntu/Debian
 
 ```bash
 # Clone and build
-git clone https://github.com/dyhao/claude-buddy.git
+git clone https://github.com/bigsheeper/claude-buddy.git
 cd claude-buddy
 npm install
 npm run build

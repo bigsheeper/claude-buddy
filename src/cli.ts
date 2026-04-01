@@ -1,9 +1,10 @@
 import { execSync, spawn } from 'node:child_process'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync, appendFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { homedir } from 'node:os'
 import { sendCommand } from './ipc/client.js'
-import { getSocketPath } from './state/config.js'
+import { getSocketPath, getConfigDir } from './state/config.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -129,15 +130,116 @@ async function main(): Promise<void> {
     return
   }
 
-  console.log(`Usage: claude-buddy [start|stop|pet|stats|mute]
+  if (command === 'install') {
+    installAutostart()
+    return
+  }
+
+  if (command === 'uninstall') {
+    uninstallAutostart()
+    return
+  }
+
+  console.log(`Usage: claude-buddy [command]
 
 Commands:
-  start   Launch buddy in a tmux pane (default)
-  stop    Close the buddy pane
-  pet     Pet your buddy (sends ♥)
-  stats   Toggle stats display
-  mute    Toggle speech bubbles
-  run     Run directly (no tmux, for internal use)`)
+  start       Launch buddy in a tmux pane (default)
+  stop        Close the buddy pane
+  pet         Pet your buddy (sends ♥)
+  stats       Toggle stats display
+  mute        Toggle speech bubbles
+  install     Auto-start buddy on every new terminal
+  uninstall   Remove auto-start
+  run         Run directly (no tmux, for internal use)`)
+}
+
+// ── Autostart ──────────────────────────────────────────────────────
+
+const SHELL_MARKER_BEGIN = '# >>> claude-buddy autostart >>>'
+const SHELL_MARKER_END = '# <<< claude-buddy autostart <<<'
+
+function getShellRcPath(): string {
+  const shell = process.env.SHELL ?? '/bin/zsh'
+  if (shell.includes('zsh')) return join(homedir(), '.zshrc')
+  if (shell.includes('bash')) return join(homedir(), '.bashrc')
+  return join(homedir(), '.profile')
+}
+
+function getAutoStartSnippet(): string {
+  const mainScript = join(__dirname, 'main.js')
+  // This snippet:
+  // 1. Only runs in interactive shells
+  // 2. Checks if already inside tmux
+  // 3. If in tmux: checks if buddy pane exists, spawns one if not
+  // 4. If not in tmux: starts a detached buddy tmux session in background
+  return `${SHELL_MARKER_BEGIN}
+# Auto-start claude-buddy companion
+if [[ $- == *i* ]] && command -v node >/dev/null 2>&1 && command -v tmux >/dev/null 2>&1; then
+  _claude_buddy_main="${mainScript}"
+  _claude_buddy_sock="${getConfigDir()}/buddy.sock"
+  if [[ -n "$TMUX" ]]; then
+    # Inside tmux: spawn buddy pane if not already running
+    if [[ ! -S "$_claude_buddy_sock" ]]; then
+      tmux split-window -h -l 36 -d "node --enable-source-maps $_claude_buddy_main" 2>/dev/null
+      tmux select-pane -t '{last}' -T claude-buddy 2>/dev/null
+    fi
+  else
+    # Outside tmux: start buddy in a detached session (attach with: tmux attach -t buddy-session)
+    if ! tmux has-session -t buddy-session 2>/dev/null; then
+      tmux new-session -d -s buddy-session -x 40 -y 24 "node --enable-source-maps $_claude_buddy_main" 2>/dev/null
+    fi
+  fi
+  unset _claude_buddy_main _claude_buddy_sock
+fi
+${SHELL_MARKER_END}`
+}
+
+function installAutostart(): void {
+  const rcPath = getShellRcPath()
+  const rcName = rcPath.split('/').pop()
+
+  // Check if already installed
+  if (existsSync(rcPath)) {
+    const content = readFileSync(rcPath, 'utf-8')
+    if (content.includes(SHELL_MARKER_BEGIN)) {
+      console.log(`Already installed in ~/${rcName}. Use 'claude-buddy uninstall' to remove.`)
+      return
+    }
+  }
+
+  const snippet = getAutoStartSnippet()
+  appendFileSync(rcPath, '\n' + snippet + '\n')
+  console.log(`Installed auto-start in ~/${rcName}`)
+  console.log('')
+  console.log('Behavior:')
+  console.log('  - In tmux: auto-spawns a buddy pane (right side, 36 cols)')
+  console.log('  - Outside tmux: starts buddy in a detached "buddy-session"')
+  console.log('    (attach with: tmux attach -t buddy-session)')
+  console.log('')
+  console.log(`Restart your terminal or run: source ~/${rcName}`)
+}
+
+function uninstallAutostart(): void {
+  const rcPath = getShellRcPath()
+  const rcName = rcPath.split('/').pop()
+
+  if (!existsSync(rcPath)) {
+    console.log(`No ~/${rcName} found.`)
+    return
+  }
+
+  const content = readFileSync(rcPath, 'utf-8')
+  if (!content.includes(SHELL_MARKER_BEGIN)) {
+    console.log(`No claude-buddy autostart found in ~/${rcName}.`)
+    return
+  }
+
+  const regex = new RegExp(
+    `\\n?${SHELL_MARKER_BEGIN}[\\s\\S]*?${SHELL_MARKER_END}\\n?`,
+  )
+  const cleaned = content.replace(regex, '\n')
+  writeFileSync(rcPath, cleaned)
+  console.log(`Removed auto-start from ~/${rcName}`)
 }
 
 main().catch(console.error)

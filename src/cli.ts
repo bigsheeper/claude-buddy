@@ -174,8 +174,9 @@ if [[ $- == *i* ]] && command -v node >/dev/null 2>&1 && command -v tmux >/dev/n
     touch "$_claude_buddy_lock" 2>/dev/null
     tmux split-window -t "$sess" -h -l 20 "node --enable-source-maps $_claude_buddy_main" 2>/dev/null
     sleep 0.5
-    tmux select-pane -t "$sess:{last}" -T claude-buddy 2>/dev/null
-    tmux select-pane -t "$sess:{previous}" 2>/dev/null
+    # Set title on the new (right) pane, then force focus to pane 0 (left/shell)
+    tmux select-pane -t "$sess:.1" -T claude-buddy 2>/dev/null
+    tmux select-pane -t "$sess:.0" 2>/dev/null
     rm -f "$_claude_buddy_lock" 2>/dev/null
   }
   if [[ -z "$TMUX" ]]; then

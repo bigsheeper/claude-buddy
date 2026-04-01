@@ -2,18 +2,7 @@
 
 A tamagotchi-like coding companion that lives in your terminal. Inspired by [Claude Code](https://claude.ai/claude-code)'s built-in pet system.
 
-```
-  ┌──────────────────────────────────────┐
-  │ "Have you tried turning it           │
-  │ off and on again?"                   │
-  ╰──────────────────────────────────────╯
-                  ╲
-              /\    /\
-             ( ·    · )
-             (   ..   )
-              `------´
-             Sir Chonk ★★★
-```
+![screenshot](screenshot.png)
 
 ## What is this?
 

@@ -119,17 +119,23 @@ cd claude-buddy
 npm install
 npm run build
 
-# Launch in tmux (auto splits a pane)
-node dist/cli.js start
-
-# Or run directly (no tmux)
-node dist/main.js
+# Install auto-start (adds to ~/.zshrc, one-time setup)
+node dist/cli.js install
 ```
 
-### npx (coming soon)
+That's it. Open a new terminal and your buddy will be there.
+
+- **In tmux** — auto-spawns a buddy pane on the right (36 cols)
+- **Outside tmux** — starts buddy in a detached session (`tmux attach -t buddy-session` to see it)
+
+### Manual Launch
 
 ```bash
-npx claude-buddy
+# Start manually (without auto-start)
+node dist/cli.js start
+
+# Run directly in current terminal (no tmux)
+node dist/main.js
 ```
 
 ## Usage
@@ -137,11 +143,13 @@ npx claude-buddy
 ### Commands
 
 ```bash
-claude-buddy start    # Launch buddy in a tmux pane (default)
-claude-buddy stop     # Close the buddy pane
-claude-buddy pet      # Pet your buddy from another pane (♥)
-claude-buddy stats    # Toggle stats display
-claude-buddy mute     # Toggle speech bubbles
+claude-buddy install    # Auto-start on every new terminal
+claude-buddy uninstall  # Remove auto-start
+claude-buddy start      # Launch buddy in a tmux pane (manual)
+claude-buddy stop       # Close the buddy pane
+claude-buddy pet        # Pet your buddy from another pane (♥)
+claude-buddy stats      # Toggle stats display
+claude-buddy mute       # Toggle speech bubbles
 ```
 
 ### In-Pane Keyboard Shortcuts

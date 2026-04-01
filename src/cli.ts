@@ -158,24 +158,32 @@ function getAutoStartSnippet(): string {
 # Auto-start claude-buddy companion
 if [[ $- == *i* ]] && command -v node >/dev/null 2>&1 && command -v tmux >/dev/null 2>&1; then
   _claude_buddy_main="${mainScript}"
+  _cb_ensure_buddy() {
+    # Spawn buddy pane in session $1 if not already present
+    if ! tmux list-panes -t "$1" -F '#{pane_title}' 2>/dev/null | grep -q 'claude-buddy'; then
+      tmux split-window -t "$1" -h -l 36 "node --enable-source-maps $_claude_buddy_main" 2>/dev/null
+      sleep 0.5
+      tmux select-pane -t "$1:{last}" -T claude-buddy 2>/dev/null
+      tmux select-pane -t "$1:{previous}" 2>/dev/null
+    fi
+  }
   if [[ -z "$TMUX" ]]; then
-    # Not in tmux: auto-enter tmux session
+    # Not in tmux: ensure buddy pane exists, then enter tmux
     if tmux has-session -t main 2>/dev/null; then
+      _cb_ensure_buddy main
       exec tmux attach -t main
     else
-      exec tmux new-session -s main
+      # New session — create it, then spawn buddy inside
+      tmux new-session -d -s main 2>/dev/null
+      _cb_ensure_buddy main
+      exec tmux attach -t main
     fi
-  fi
-  # Inside tmux: spawn buddy pane if not already present
-  # Use tmux pane title to detect (reliable even after crash/stale socket)
-  if ! tmux list-panes -F '#{pane_title}' 2>/dev/null | grep -q 'claude-buddy'; then
-    tmux split-window -h -l 36 "node --enable-source-maps $_claude_buddy_main" 2>/dev/null
-    tmux select-pane -t '{last}' -T claude-buddy 2>/dev/null
-    # Brief pause so Ink can grab raw mode before we yank focus away
-    sleep 0.5
-    tmux select-pane -L 2>/dev/null
+  else
+    # Already in tmux: ensure buddy pane in current session
+    _cb_ensure_buddy "$(tmux display-message -p '#S')"
   fi
   unset _claude_buddy_main
+  unset -f _cb_ensure_buddy
 fi
 ${SHELL_MARKER_END}`
 }

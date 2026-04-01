@@ -1,0 +1,33 @@
+{
+  "name": "claude-buddy",
+  "version": "0.1.0",
+  "description": "A tamagotchi-like coding companion that lives in your terminal — inspired by Claude Code's built-in pet system",
+  "type": "module",
+  "keywords": ["cli", "terminal", "pet", "tamagotchi", "companion", "ascii-art", "ink", "tmux"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dyhao/claude-buddy.git"
+  },
+  "bin": {
+    "claude-buddy": "./bin/claude-buddy.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node --enable-source-maps dist/cli.js"
+  },
+  "dependencies": {
+    "ink": "^5.2.0",
+    "ink-text-input": "^6.0.0",
+    "react": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

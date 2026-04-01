@@ -1,5 +1,7 @@
 # claude-buddy
 
+[English](README.md) | [中文](README_zh.md)
+
 A tamagotchi-like coding companion that lives in your terminal. Inspired by [Claude Code](https://claude.ai/claude-code)'s built-in pet system.
 
 ![screenshot](screenshot.png)

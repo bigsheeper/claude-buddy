@@ -158,7 +158,6 @@ function getAutoStartSnippet(): string {
 # Auto-start claude-buddy companion
 if [[ $- == *i* ]] && command -v node >/dev/null 2>&1 && command -v tmux >/dev/null 2>&1; then
   _claude_buddy_main="${mainScript}"
-  _claude_buddy_sock="${getConfigDir()}/buddy.sock"
   if [[ -z "$TMUX" ]]; then
     # Not in tmux: auto-enter tmux session
     if tmux has-session -t main 2>/dev/null; then
@@ -166,15 +165,15 @@ if [[ $- == *i* ]] && command -v node >/dev/null 2>&1 && command -v tmux >/dev/n
     else
       exec tmux new-session -s main
     fi
-    # exec replaces this shell — lines below only run inside tmux
   fi
-  # Inside tmux: spawn buddy pane if not already running
-  if [[ ! -S "$_claude_buddy_sock" ]]; then
+  # Inside tmux: spawn buddy pane if not already present
+  # Use tmux pane title to detect (reliable even after crash/stale socket)
+  if ! tmux list-panes -F '#{pane_title}' 2>/dev/null | grep -q 'claude-buddy'; then
     tmux split-window -h -l 36 -d "node --enable-source-maps $_claude_buddy_main" 2>/dev/null
     tmux select-pane -t '{last}' -T claude-buddy 2>/dev/null
     tmux select-pane -t '{previous}' 2>/dev/null
   fi
-  unset _claude_buddy_main _claude_buddy_sock
+  unset _claude_buddy_main
 fi
 ${SHELL_MARKER_END}`
 }

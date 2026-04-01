@@ -127,20 +127,26 @@ That's it. Open a new terminal and your buddy will be there.
 
 Every new terminal window automatically enters tmux with a buddy pane on the right (20 cols). Each terminal gets its own independent session — fresh every time, no leftover history.
 
-## Usage
-
-### Commands
+### Uninstall
 
 ```bash
-claude-buddy install    # Auto-start on every new terminal (one-time setup)
-claude-buddy uninstall  # Remove auto-start
-claude-buddy stop       # Close the buddy pane
-claude-buddy pet        # Pet your buddy from another pane (♥)
+node dist/cli.js uninstall   # Removes the snippet from ~/.zshrc
+```
+
+## Usage
+
+### CLI Commands (from any terminal)
+
+```bash
+claude-buddy pet        # Pet your buddy (♥)
 claude-buddy stats      # Toggle stats display
 claude-buddy mute       # Toggle speech bubbles
+claude-buddy stop       # Close the buddy pane
 ```
 
 ### In-Pane Keyboard Shortcuts
+
+Click the buddy pane, then:
 
 | Key | Action |
 |-----|--------|
@@ -149,6 +155,12 @@ claude-buddy mute       # Toggle speech bubbles
 | `m` | Mute/unmute speech bubbles |
 | `h` | Show/hide help |
 | `q` | Quit |
+
+### tmux Tips
+
+- **Switch pane focus**: `Ctrl+b` then arrow key
+- **Scroll**: two-finger trackpad scroll (requires `set -g mouse on` in `~/.tmux.conf`)
+- **Keyboard scroll**: `Ctrl+b [` to enter scroll mode, `q` to exit
 
 ## Architecture
 

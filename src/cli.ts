@@ -85,12 +85,22 @@ function stopBuddy(): void {
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2)
-  const command = args[0] ?? 'start'
+  const command = args[0] ?? 'install'
+
+  if (command === 'install') {
+    installAutostart()
+    return
+  }
+
+  if (command === 'uninstall') {
+    uninstallAutostart()
+    return
+  }
 
   // Direct IPC commands (no tmux needed)
   if (['pet', 'stats', 'mute'].includes(command)) {
     if (!isBuddyRunning()) {
-      console.log('No buddy is running. Start one with: claude-buddy start')
+      console.log('No buddy is running. Open a new terminal after install.')
       process.exit(1)
     }
     const ok = await sendCommand(command)
@@ -107,50 +117,21 @@ async function main(): Promise<void> {
     return
   }
 
-  if (command === 'start') {
-    if (!hasTmux()) {
-      console.log('tmux is required. Install with:')
-      console.log('  macOS:  brew install tmux')
-      console.log('  Ubuntu: sudo apt install tmux')
-      process.exit(1)
-    }
-
-    if (isBuddyRunning()) {
-      console.log('Buddy is already running! Use `claude-buddy pet` to interact.')
-      return
-    }
-
-    startBuddyPane()
-    return
-  }
-
-  if (command === 'run') {
-    // Direct run (no tmux, used internally by tmux pane)
+  if (command === '_run') {
+    // Internal: launched by the autostart snippet inside tmux
     await import('./main.js')
-    return
-  }
-
-  if (command === 'install') {
-    installAutostart()
-    return
-  }
-
-  if (command === 'uninstall') {
-    uninstallAutostart()
     return
   }
 
   console.log(`Usage: claude-buddy [command]
 
 Commands:
-  start       Launch buddy in a tmux pane (default)
-  stop        Close the buddy pane
-  pet         Pet your buddy (sends ♥)
-  stats       Toggle stats display
-  mute        Toggle speech bubbles
-  install     Auto-start buddy on every new terminal
+  install     Auto-start buddy on every new terminal (default)
   uninstall   Remove auto-start
-  run         Run directly (no tmux, for internal use)`)
+  stop        Close the buddy pane
+  pet         Pet your buddy from another pane (♥)
+  stats       Toggle stats display
+  mute        Toggle speech bubbles`)
 }
 
 // ── Autostart ──────────────────────────────────────────────────────

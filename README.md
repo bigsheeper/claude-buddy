@@ -128,24 +128,13 @@ That's it. Open a new terminal and your buddy will be there.
 - **In tmux** — auto-spawns a buddy pane on the right (36 cols)
 - **Outside tmux** — starts buddy in a detached session (`tmux attach -t buddy-session` to see it)
 
-### Manual Launch
-
-```bash
-# Start manually (without auto-start)
-node dist/cli.js start
-
-# Run directly in current terminal (no tmux)
-node dist/main.js
-```
-
 ## Usage
 
 ### Commands
 
 ```bash
-claude-buddy install    # Auto-start on every new terminal
+claude-buddy install    # Auto-start on every new terminal (one-time setup)
 claude-buddy uninstall  # Remove auto-start
-claude-buddy start      # Launch buddy in a tmux pane (manual)
 claude-buddy stop       # Close the buddy pane
 claude-buddy pet        # Pet your buddy from another pane (♥)
 claude-buddy stats      # Toggle stats display

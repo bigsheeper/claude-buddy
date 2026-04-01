@@ -117,6 +117,21 @@ Each form adds decorations to your buddy's sprite:
 | Elite | 15-19 | Side decorations `»...«` + bottom accent |
 | Legend | 20 | Golden color + `✦` border |
 
+Example — evolution of a Chonk:
+
+```
+ Lv.1 Baby        Lv.5 Teen         Lv.10 Adult        Lv.15 Elite        Lv.20 Legend
+
+                      *                  \^^^/              ✦   ✦             ✦ ✦ ✦
+  /\    /\          /\    /\            /\    /\           /\    /\          ◆/\  /\◆
+ ( ·    · )        ( ✦    ✦ )         (( ·    · ))       «( ·    · )»      ✦( ✦  ✦ )✦
+ (   ..   )        (   ..   )          (   ^^   )        «(   ^^   )»      ✦(  ^^   )✦
+  `------´          `------´          =(________)=       «(________)»      ✦(________)✦
+                                                          ~~~~~~~~~~        ✦✦✦✦✦✦✦✦✦✦
+   Chonk             Chonk              Chonk              Chonk             Chonk
+                                                                            ★★★★★
+```
+
 ### Animations
 
 - **Idle loop** — 15-frame sequence at 500ms ticks (~7.5s cycle): mostly resting, occasional fidgets, rare blinks

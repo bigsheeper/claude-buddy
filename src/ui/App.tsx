@@ -17,6 +17,7 @@ import {
   grantCommitXp,
   grantCommandXp,
   getLevelUpMessage,
+  getForm,
 } from '../growth/growth.js'
 import { countTodayCommits, countHistoryLines } from '../growth/activity.js'
 
@@ -116,7 +117,7 @@ export function App(): React.ReactNode {
       timer = setTimeout(() => {
         const state = getState()
         if (!state.muted) {
-          setReaction(getRandomQuip(companion))
+          setReaction(getRandomQuip(companion, growth.level))
         }
         scheduleQuip()
       }, randomInterval())
@@ -191,6 +192,8 @@ export function App(): React.ReactNode {
         companion={companion}
         reaction={reaction}
         petAt={petAt}
+        form={getForm(growth.level)}
+        level={growth.level}
       />
 
       <Box marginTop={1}>

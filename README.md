@@ -69,6 +69,30 @@ Each pet has a **peak stat** and a **dump stat**, with the rest scattered. Stats
 - **WISDOM** — Deep programming insights
 - **SNARK** — Sarcastic commentary rate
 
+### Growth System (20 Levels)
+
+Your buddy gains XP and levels up over time:
+
+| XP Source | Amount | Cap |
+|-----------|--------|-----|
+| Daily login | +10 XP | 1x/day |
+| Pet (touch) | +2 XP | 20 XP/day |
+| View stats | +1 XP | 5 XP/day |
+| git commit | +5 XP | uncapped |
+| Terminal commands | +1 XP | per 10 commands |
+| Consecutive days | +5 × streak | resets on miss |
+
+**Milestone unlocks:**
+
+| Level | Reward |
+|-------|--------|
+| 5 | Teen form + sleeping animation |
+| 10 | Adult form + 3 new hats + new quips |
+| 15 | Elite form + dancing animation + 3 new hats |
+| 20 | Legend form (glowing border) + all content |
+
+Stats grow with level — all stats get +5/+10/+15/+20 at milestones, plus peak stat gets +2 per even level.
+
 ### Animations
 
 - **Idle loop** — 15-frame sequence at 500ms ticks (~7.5s cycle): mostly resting, occasional fidgets, rare blinks

@@ -2,10 +2,12 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import type { StoredCompanion } from '../companion/types.js'
+import type { GrowthState } from '../growth/types.js'
 
 export interface BuddyConfig {
   companion?: StoredCompanion
   companionMuted?: boolean
+  growth?: GrowthState
 }
 
 const CONFIG_DIR = join(homedir(), '.claude-buddy')

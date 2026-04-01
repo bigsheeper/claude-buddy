@@ -19,12 +19,26 @@ Claude Code（Anthropic 官方 CLI 工具）内置了一个隐藏的电子宠物
 你的宠物由**用户名哈希确定性生成** —— 每个人都有独一无二的宠物。
 
 ```
-  鸭子 Duck     鹅 Goose      果冻 Blob      猫 Cat        龙 Dragon     章鱼 Octopus
+  鸭子          鹅            果冻          猫            龙            章鱼
+  Duck          Goose         Blob          Cat           Dragon        Octopus
   <(· )___      (·>           (··)          =·ω·=         <·~·>         ~(··)~
+   (  ._>        ||           .----.        /\_/\         /^\  /^\       .----.
+    `--´        _(__)_       ( ·  · )      ( ·   ·)      <  ·  ·  >    ( ·  · )
+                 ^^^^         `----´       (  ω  )       (   ~~   )    (______)
 
-  猫头鹰 Owl    企鹅 Penguin   乌龟 Turtle   蜗牛 Snail     幽灵 Ghost    六角恐龙 Axolotl
+  猫头鹰        企鹅          乌龟          蜗牛          幽灵          六角恐龙
+  Owl           Penguin       Turtle        Snail         Ghost         Axolotl
+  (·)(·)        (·>)          [·_·]         ·(@)          /··\          }·.·{
+   /\  /\       .---.         _,--._       .--.           .----.       }~(______)~{
+  ((·)(·))      (·>·)        ( ·  · )     ( @ )          / ·  · \     }~(· .. ·)~{
+  (  ><  )     /(   )\       /[______]\    \_`--´         |      |      ( .--. )
 
-  水豚 Capybara 仙人掌 Cactus  机器人 Robot   兔子 Rabbit   蘑菇 Mushroom  胖墩 Chonk
+  水豚          仙人掌        机器人        兔子          蘑菇          胖墩
+  Capybara      Cactus        Robot         Rabbit        Mushroom      Chonk
+  (·oo·)        |·  ·|        [··]          (·..·)        |·  ·|        (·.·)
+  n______n       ____         .[||].        (\__/)       .-o-OO-o-.     /\    /\
+ ( ·    · )     |·  ·|       [ ·  · ]      ( ·  · )    (__________)   ( ·    · )
+ (   oo   )     |_|  |_|     [ ==== ]      =(  ..  )=     |·  ·|      (   ..   )
 ```
 
 ### 5 个稀有度
